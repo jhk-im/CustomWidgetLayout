@@ -22,26 +22,34 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MainPage(),
+      home: MainPage(),
     );
   }
 }
 
 class MainPage extends StatelessWidget {
-  const MainPage({Key? key}) : super(key: key);
+  MainPage({Key? key}) : super(key: key);
+
+  late AppBar appBar;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    AppBar createAppBar() {
+      appBar = AppBar(
         actions: [
           IconButton(
               onPressed: () {
                 print('Add Widget');
+                print(appBar.preferredSize.height);
               },
               icon: const Icon(Icons.add)),
         ],
-      ),
+      );
+      return appBar;
+    }
+
+    return Scaffold(
+      appBar: createAppBar(),
       body: const CustomWidgetLayout(),
     );
   }

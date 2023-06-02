@@ -75,6 +75,7 @@ class _CustomWidgetLayoutState extends State<CustomWidgetLayout> {
           itemCount: customWidgets.length,
           itemBuilder: (context, index) {
             return CustomWidgetItem(
+              listViewIndex: index,
               spacing: widget.spacing,
               radius: widget.radius,
               itemType: customWidgets[index].type,
@@ -82,6 +83,13 @@ class _CustomWidgetLayoutState extends State<CustomWidgetLayout> {
               isDeleteButtonVisible: isDeleteButtonVisible,
               longPressCallback: () {
                 _commonLongPress();
+              },
+              dragCallback: (index) {
+                setState(() {
+                   final widget = customWidgets[index];
+                   customWidgets.removeAt(index);
+                   customWidgets.insert(0, widget);
+                });
               },
             );
           },

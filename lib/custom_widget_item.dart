@@ -1,6 +1,3 @@
-import 'dart:ffi';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 enum CwiType { item1x1, item2x1, item2x2 }
@@ -8,28 +5,36 @@ enum CwiType { item1x1, item2x1, item2x2 }
 class CustomWidgetItem extends StatefulWidget {
   const CustomWidgetItem({
     Key? key,
+    required this.listViewIndex,
     required this.spacing,
     required this.radius,
     required this.itemType,
     required this.widgets,
-    required this.longPressCallback,
     required this.isDeleteButtonVisible,
+    required this.longPressCallback,
+    required this.dragCallback,
   }) : super(key: key);
 
+  final int listViewIndex;
   final double spacing;
   final double radius;
   final CwiType itemType;
   final List<Widget> widgets;
-  final Function() longPressCallback;
   final bool isDeleteButtonVisible;
+  final Function() longPressCallback;
+  final Function(int listViewIndex) dragCallback;
 
   @override
   State<CustomWidgetItem> createState() => _CustomWidgetItemState();
 }
 
 class _CustomWidgetItemState extends State<CustomWidgetItem> {
+
+  final _globalKeys = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
+
     final gridItemSize = [
       [2.0, 1.0, 1.0, 2.0, 1.5, 1.5], // 1 x 1
       [1.0, 2.0, 1.0, 2.0, 2.0, 1.5], // 2 x 1
@@ -37,6 +42,7 @@ class _CustomWidgetItemState extends State<CustomWidgetItem> {
     ];
 
     return GridView.builder(
+      key: _globalKeys,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: widget.widgets.length,
@@ -49,6 +55,24 @@ class _CustomWidgetItemState extends State<CustomWidgetItem> {
         return LongPressDraggable(
           data: widget.widgets[index],
           childWhenDragging: Container(),
+          onDragStarted: () {
+            print('CustomWidget Drag Start');
+            if (!widget.isDeleteButtonVisible) widget.longPressCallback();
+          },
+          onDragUpdate: (detail) {
+            print(detail.delta);
+            // if (_globalKeys.currentContext != null) {
+            //   final RenderBox renderBox =
+            //   _globalKeys.currentContext!.findRenderObject() as RenderBox;
+            //   //print(renderBox.localToGlobal(Offset.zero));
+            //   print(renderBox.size);
+            // }
+          },
+          onDragEnd: (details) {
+            print('CustomWidget Drag End');
+            widget.dragCallback(widget.listViewIndex);
+            //print(details.offset);
+          },
           feedback: Material(
             color: Colors.transparent,
             child: Container(
