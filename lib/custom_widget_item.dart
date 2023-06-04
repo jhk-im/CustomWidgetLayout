@@ -13,6 +13,7 @@ class CustomWidgetItem extends StatefulWidget {
     required this.isDeleteButtonVisible,
     required this.longPressCallback,
     required this.dragCallback,
+    required this.scrollCallback,
   }) : super(key: key);
 
   final int listViewIndex;
@@ -23,6 +24,7 @@ class CustomWidgetItem extends StatefulWidget {
   final bool isDeleteButtonVisible;
   final Function() longPressCallback;
   final Function(int listViewIndex) dragCallback;
+  final Function(double moveY) scrollCallback;
 
   @override
   State<CustomWidgetItem> createState() => _CustomWidgetItemState();
@@ -40,6 +42,9 @@ class _CustomWidgetItemState extends State<CustomWidgetItem> {
       [1.0, 2.0, 1.0, 2.0, 2.0, 1.5], // 2 x 1
       [1.0, 1.0, 1.0, 1.0, 2.0, 2.0], // 2 x 2
     ];
+
+    double dragX = 0.0;
+    double dragY = 0.0;
 
     return GridView.builder(
       key: _globalKeys,
@@ -60,7 +65,14 @@ class _CustomWidgetItemState extends State<CustomWidgetItem> {
             if (!widget.isDeleteButtonVisible) widget.longPressCallback();
           },
           onDragUpdate: (detail) {
-            print(detail.delta);
+            dragX += detail.delta.dx;
+            dragY += detail.delta.dy;
+            // print(dragX);
+            // print(dragY);
+            // 스크롤 콜백
+            widget.scrollCallback(dragY);
+
+            print(detail.globalPosition.dy);
             // if (_globalKeys.currentContext != null) {
             //   final RenderBox renderBox =
             //   _globalKeys.currentContext!.findRenderObject() as RenderBox;
@@ -70,8 +82,10 @@ class _CustomWidgetItemState extends State<CustomWidgetItem> {
           },
           onDragEnd: (details) {
             print('CustomWidget Drag End');
-            widget.dragCallback(widget.listViewIndex);
-            //print(details.offset);
+            dragX = 0.0;
+            dragY = 0.0;
+            // 순서바꾸기
+            //widget.dragCallback(widget.listViewIndex);
           },
           feedback: Material(
             color: Colors.transparent,

@@ -60,6 +60,9 @@ class _CustomWidgetLayoutState extends State<CustomWidgetLayout> {
 
   @override
   Widget build(BuildContext context) {
+
+    ScrollController _controller = ScrollController();
+
     return GestureDetector(
       onLongPress: () {
         print('CustomWidgetLayout - LongPress');
@@ -71,6 +74,7 @@ class _CustomWidgetLayoutState extends State<CustomWidgetLayout> {
       },
       child: SafeArea(
         child: ListView.builder(
+          controller: _controller,
           padding: EdgeInsets.all(widget.spacing / 2),
           itemCount: customWidgets.length,
           itemBuilder: (context, index) {
@@ -90,6 +94,9 @@ class _CustomWidgetLayoutState extends State<CustomWidgetLayout> {
                    customWidgets.removeAt(index);
                    customWidgets.insert(0, widget);
                 });
+              },
+              scrollCallback: (moveY) {
+                _controller.jumpTo(moveY);
               },
             );
           },
